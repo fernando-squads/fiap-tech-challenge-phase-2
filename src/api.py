@@ -1,9 +1,11 @@
 from dotenv import load_dotenv
+from src.logger import logging
 from fastapi import FastAPI
 from src.schemas import DiabetesInput, DiabetesOutput
 from src.predictor import DiabetesPredictor
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Diabetes Prediction API",
@@ -15,6 +17,7 @@ predictor = DiabetesPredictor()
 
 @app.post("/predict", response_model=DiabetesOutput)
 def predict_diabetes(input_data: DiabetesInput):
+    logger.info(f"Iniciando requisição na API /predict")
     data = [
         input_data.Pregnancies,
         input_data.Glucose,
@@ -27,6 +30,8 @@ def predict_diabetes(input_data: DiabetesInput):
     ]
 
     prediction, probability, message = predictor.predict(data)
+
+    logger.info(f"Requisição na API /predict realizada com sucesso!")
 
     return {
         "prediction": prediction,

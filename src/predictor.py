@@ -1,3 +1,4 @@
+from src.logger import logging
 import tensorflow as tf
 import joblib
 import numpy as np
@@ -9,10 +10,13 @@ SCALER_PATH = "models/scaler.pkl"
 
 class DiabetesPredictor:
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
         self.model = tf.keras.models.load_model(MODEL_PATH)
         self.scaler = joblib.load(SCALER_PATH)
 
+
     def predict(self, data: list):
+        self.logger.info(f"Iniciando predição utilizando os parametros: {data}")
         X = np.array([data])
         X_scaled = self.scaler.transform(X)
 
@@ -20,6 +24,8 @@ class DiabetesPredictor:
 
         prob = float(predict[0][0])
         pred = int(prob > 0.5)
-        message = explain_with_llm(FEATURES, data)
+        message = explain_with_llm(FEATURES, data, prob)
+
+        self.logger.info(f"A predição retornou a probabilidade do paciente possuir dibates de {prob}")
 
         return pred, prob, message
