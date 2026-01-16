@@ -1,0 +1,14 @@
+flowchart TB
+    User(["Usuário"]) --> CLI["main.py"]
+    CLI --> GeneSpace["config.py"] & DataLoader["src/data_loader.py"] & Logger["src/logger.py"] & Tests["pytest<br>src/tests/"]
+    Data["diabetes.csv"] --> DataLoader
+    DataLoader --> Preprocess["Normalização<br>(StandardScaler)"]
+    Preprocess --> GA["src/genetic_optimizer.py"] & OptimizedModel["src/model.py"]
+    GA --> Fitness["Fitness Function<br>Accuracy + Recall + F1"] & Logger
+    Fitness --> GAProcess["Seleção<br>Crossover<br>Mutação<br>Evolução"]
+    GAProcess --> BestParams["Melhores<br>Hiperparâmetros"]
+    BestParams --> OptimizedModel & LLM["src/llm_explainer.py"]
+    OptimizedModel --> FinalMetrics["Accuracy<br>Recall<br>F1-score"] & Logger
+    FinalMetrics --> LLM
+    LLM --> Explanation["Explicação Clínica<br>em Linguagem Natural"] & Logger
+    Logger --> Logs["logs/fiap_tech_challenge_phase_2.log"]
