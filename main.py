@@ -1,12 +1,12 @@
-from src.logger import logging
-from src.data_loader import load_data
+from src.monitoring import logging
+from src.data import load_data
 from src.config import TEST_SIZE, RANDOM_STATE, GA_MODEL_PARAMETER
 from src.model import build_model
-from src.compile import compale_and_save
+from src.model import compale_and_save
 
 logger = logging.getLogger(__name__)
 
-file_path = './diabetes.csv'
+file_path = './src/data/diabetes.csv'
 
 logger.info("Iniciando o aplicativo")
 

@@ -9,9 +9,3 @@ class DiabetesInput(BaseModel):
     BMI: float = Field(..., gt=0)
     DiabetesPedigreeFunction: float = Field(..., gt=0)
     Age: int = Field(..., gt=0)
-
-class DiabetesOutput(BaseModel):
-    prediction: int
-    probability: float
-    diagnosis: str
-    message: str

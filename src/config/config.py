@@ -29,4 +29,23 @@ GA_MODEL_PARAMETER = {
     "batch_size": 16,
     "validation_split": 0.2
 }
-FEATURES = ["Gravidez", "Glicose", "Pressão Arterial", "Espessura da Pele", "Insulina", "IMC", "Função Diabética", "Idade"]
+FEATURES = [
+    "Gravidez",
+    "Glicose",
+    "Pressão Arterial",
+    "Espessura da Pele",
+    "Insulina",
+    "IMC",
+    "Função Diabética",
+    "Idade"
+]
+FEATURES_DF = [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age",
+]

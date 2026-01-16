@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
-from src.logger import logging
+from src.monitoring import logging
 from fastapi import FastAPI
-from src.schemas import DiabetesInput, DiabetesOutput
-from src.predictor import DiabetesPredictor
+from src.schema import DiabetesInput, DiabetesOutput
+from src.model import DiabetesPredictor
 
 load_dotenv()
 logger = logging.getLogger(__name__)

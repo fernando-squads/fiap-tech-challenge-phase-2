@@ -1,4 +1,4 @@
-from src.logger import logging
+from src.monitoring import logging
 from openai import OpenAI
 
 logger = logging.getLogger(__name__)

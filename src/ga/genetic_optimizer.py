@@ -1,4 +1,4 @@
-from src.logger import logging
+from src.monitoring import logging
 import os
 import random
 import numpy as np
