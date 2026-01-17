@@ -1,14 +1,47 @@
 flowchart TB
-    User(["Usuário"]) --> CLI["main.py"]
-    CLI --> GeneSpace["config.py"] & DataLoader["src/data_loader.py"] & Logger["src/logger.py"] & Tests["pytest<br>src/tests/"]
-    Data["diabetes.csv"] --> DataLoader
-    DataLoader --> Preprocess["Normalização<br>(StandardScaler)"]
-    Preprocess --> GA["src/genetic_optimizer.py"] & OptimizedModel["src/model.py"]
-    GA --> Fitness["Fitness Function<br>Accuracy + Recall + F1"] & Logger
-    Fitness --> GAProcess["Seleção<br>Crossover<br>Mutação<br>Evolução"]
-    GAProcess --> BestParams["Melhores<br>Hiperparâmetros"]
-    BestParams --> OptimizedModel & LLM["src/llm_explainer.py"]
-    OptimizedModel --> FinalMetrics["Accuracy<br>Recall<br>F1-score"] & Logger
-    FinalMetrics --> LLM
-    LLM --> Explanation["Explicação Clínica<br>em Linguagem Natural"] & Logger
-    Logger --> Logs["logs/fiap_tech_challenge_phase_2.log"]
+    subgraph Training["TREINAMENTO DO MODELO"]
+        User(["Usuário/main.py"]) --> CLI["src/data/data_loader.py"]
+        CLI --> Data["diabetes.csv"]
+        Data --> Preprocess["StandardScaler<br>(fit + transform)"]
+        Preprocess --> Split["Train/Test Split<br>(80/20, stratified)"]
+        Split --> GAInit["src/ga/genetic_optimizer.py<br>Population Init"]
+        GAInit --> GA["Evolução Genética<br>(GENERATIONS=10)"]
+        GA --> Fitness["Fitness Function<br>Accuracy + Recall + F1"]
+        Fitness --> Selection["Seleção<br>Crossover<br>Mutação"]
+        Selection --> BestParams["Melhores Hiperparâmetros<br>GA_MODEL_PARAMETER"]
+        BestParams --> ModelBuild["src/model/neural_network_model.py<br>build_model()"]
+        ModelBuild --> Training_Phase["Training com<br>Early Stopping<br>validation_split=0.2"]
+        Training_Phase --> SaveArtifacts["models/diabetes_model.keras<br>models/scaler.pkl"]
+    end
+
+    subgraph Inference["INFERÊNCIA & API"]
+        Request["HTTP POST /predict<br>src/api/predict_api.py"] --> Predictor["src/model/predictor.py<br>DiabetesPredictor"]
+        Predictor --> LoadModel["Carrega modelo + scaler"]
+        LoadModel --> Scale["StandardScaler.transform()"]
+        Scale --> Predict["Model.predict()"]
+        Predict --> LLM["src/llm/llm_explainer.py<br>explain_with_llm()"]
+        LLM --> Response["DiabetesOutput<br>prediction + probability<br>diagnosis + message"]
+    end
+
+    subgraph Config["CONFIGURAÇÃO"]
+        ConfigFile["src/config/config.py"]
+        ConfigFile --> GENE_SPACE["GENE_SPACE"]
+        ConfigFile --> GA_PARAMS["GA_MODEL_PARAMETER<br>DEFAULT_MODEL_PARAMETER"]
+        ConfigFile --> FEATURES["FEATURES<br>FEATURES_DF"]
+    end
+
+    subgraph Validation["VALIDAÇÃO & LOGGING"]
+        Schema["src/schema/diabetes_input.py<br>Pydantic Field validation"]
+        Logger["src/monitoring/logger.py<br>getLogger(__name__)"]
+        Tests["pytest + conftest.py<br>tests/"]
+        Logger --> LogFile["fiap_tech_challenge_phase_2.log"]
+    end
+
+    SaveArtifacts --> Predictor
+    GENE_SPACE --> GAInit
+    GA_PARAMS --> ModelBuild
+    FEATURES --> LLM
+    Schema --> Request
+    Request -.-> Tests
+    Training_Phase -.-> Logger
+    Predict -.-> Logger

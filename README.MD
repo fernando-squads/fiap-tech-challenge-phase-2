@@ -27,6 +27,12 @@ Este comando é usado para criar um arquivo chamado requirements.txt que lista t
 
 O comando `python my_script.py` é usado para executar um programa Python a partir da linha de comando. A extensão de arquivo `.py` é a convenção padrão para salvar arquivos que contêm código-fonte Python.
 
+## Executar testes automatizados
+### `Execute o comando`
+```shell script
+pytest
+```
+
 ## Execute o projeto em sua máquina
 
 ### `Execute o comando`
@@ -55,8 +61,37 @@ curl -X 'POST' \
   "Age": 50
 }'
 ```
-## Executar testes automatizados
-### `Execute o comando`
+
+## Execute o projeto utilizando Docker
+
+### `Crie um docker`
+Criar um contêiner Docker:
 ```shell script
-pytest
+docker build -t fiap_tech_challenge_phase_2:last .
+```
+### `Executar o Docker`
+Execute o Docker criado:
+```shell script
+docker run --publish 8090:8090 diabetes:last
+```
+### `Teste o Docker utilizando o Swagger`
+Abra seu navegador e cole o URL: http://127.0.0.1:8090/docs
+
+### `Teste o Docker utilizando Curl`
+No terminal, execute o código abaixo
+```shell script
+curl -X 'POST' \
+  'http://127.0.0.1:8090/predict' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "Pregnancies": 6,
+  "Glucose": 148,
+  "BloodPressure": 72,
+  "SkinThickness": 35,
+  "Insulin": 168,
+  "BMI": 33.6,
+  "DiabetesPedigreeFunction": 0.627,
+  "Age": 50
+}'
 ```
