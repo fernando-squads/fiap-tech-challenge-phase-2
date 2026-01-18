@@ -19,8 +19,10 @@ flowchart TB
         Predictor --> LoadModel["Carrega modelo + scaler"]
         LoadModel --> Scale["StandardScaler.transform()"]
         Scale --> Predict["Model.predict()"]
-        Predict --> LLM["src/llm/llm_explainer.py<br>explain_with_llm()"]
-        LLM --> Response["DiabetesOutput<br>prediction + probability<br>diagnosis + message"]
+        Predict --> LLM["src/llm/llm_explainer.py<br>explain_with_llm()<br>(OpenAI GPT-4)"]
+        LLM --> QualityEval["src/llm/llm_quality.py<br>LLMQualityEvaluator"]
+        QualityEval --> QualityMetrics["ROUGE + BLEU<br>Medical Terms Detection<br>Response Validation<br>Overall Quality Score"]
+        QualityMetrics --> Response["DiabetesOutput<br>prediction + probability<br>diagnosis + message"]
     end
 
     subgraph Config["CONFIGURAÇÃO"]
@@ -34,7 +36,9 @@ flowchart TB
         Schema["src/schema/diabetes_input.py<br>Pydantic Field validation"]
         Logger["src/monitoring/logger.py<br>getLogger(__name__)"]
         Tests["pytest + conftest.py<br>tests/"]
+        QualityTests["tests/test_llm_quality.py<br>5 test cases"]
         Logger --> LogFile["fiap_tech_challenge_phase_2.log"]
+        QualityTests --> QualityMetricsVal["Quality Evaluation Tests<br>✓ ROUGE-1/2/L<br>✓ BLEU Score<br>✓ Medical Terms<br>✓ Response Validity<br>✓ Overall Score"]
     end
 
     SaveArtifacts --> Predictor
@@ -43,5 +47,6 @@ flowchart TB
     FEATURES --> LLM
     Schema --> Request
     Request -.-> Tests
+    QualityEval -.-> QualityTests
     Training_Phase -.-> Logger
     Predict -.-> Logger
